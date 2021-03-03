@@ -102,11 +102,28 @@ describe("smartAsset()", () => {
 
     expect(result).toEqual({ external: true, id: "./test/assets/test.png" })
   })
+
   test("load(), rebase mode, uses publicPath", async () => {
     const options = { url: "rebase", extensions: [".png"], rebasePath: "node_modules", publicPath: "/vendor" }
     const result = await smartAsset(options).load("node_modules/test/assets/test.png")
 
     expect(result).toEqual(`${idComment}\nexport default "/vendor/test/assets/test.png"`)
+  })
+
+  test("load(), rebase mode with keepImport and preserveModules", async () => {
+    const options = {
+      url: "rebase",
+      preserveModules: true,
+      keepImport: true,
+      extensions: [".png"],
+      inputFile: "src/index.ts",
+      outputDir: "dist/cjs"
+    }
+    const result1 = await smartAsset(options).resolveId("../assets/test.png", "src/icons.ts")
+    const result2 = await smartAsset(options).resolveId("../../../assets/test.png", "src/components/specific/icons.ts")
+
+    expect(result1).toEqual({ external: true, id: "../../assets/test.png" })
+    expect(result2).toEqual({ external: true, id: "../../../../assets/test.png" })
   })
 
   test("load(), inline mode, returns inlined url as exports", async () => {

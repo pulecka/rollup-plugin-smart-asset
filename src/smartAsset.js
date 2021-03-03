@@ -208,6 +208,12 @@ export default (initialOptions = {}) => {
             return { id: newAssetPath, external: true }
           }
           case "rebase": {
+            if (options.preserveModules) {
+              const outputImporter = join(options.outputDir, relative(dirname(options.inputFile), importer))
+              const assetName = relative(dirname(outputImporter), id)
+              const newAssetPath = getAssetImportPath(assetName)
+              return { id: newAssetPath, external: true }
+            }
             const assetName = relative(options.rebasePath, id)
             const newAssetPath = getAssetImportPath(assetName)
             return { id: newAssetPath, external: true }
